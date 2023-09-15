@@ -69,7 +69,7 @@ def find_all_violations(
 ) -> dict[str, dict[str, list[RuleViolation]]]:
     """
     Iterates through student code in the `code_dir` to find violations of the `rules`.
-    `rules` maps problem names to a list of RuleCheckers, each called to visit the 
+    `rules` maps problem names to a list of RuleCheckers, each called to visit the
     syntax tree and return any violations.
 
     Updates `scores` to reflect 0 points for any questions with violated rules.
@@ -119,7 +119,6 @@ def add_code_to_pdf(pdf: FPDF, code_file: str, violations: list[RuleViolation]) 
     pdf.set_text_color(255, 0, 0)
     for i, v in enumerate(violations, 28):
         pdf.cell(400, 6, txt=str(v), ln=i, align="L")
-
 
 
 def create_score_pdf(
@@ -177,7 +176,7 @@ def create_score_pdf(
 
 def get_args(args: list[str]) -> tuple[str, str, str, str]:
     """
-    Searches through the `directory` given by args[1] to find a csv, code 
+    Searches through the `directory` given by args[1] to find a csv, code
     directory, and aup
 
     Returns: directory, csv, code_directory, aup
@@ -240,8 +239,14 @@ def main():
 
     create_template_pdf(scores_df, problem_list, template_output)
     violations = find_all_violations(scores_df, rules, code_dir)
-    create_score_pdf( 
-        scores_df, problem_list, violations, code_dir, ignored_ids, name_map, full_pdf_output,
+    create_score_pdf(
+        scores_df,
+        problem_list,
+        violations,
+        code_dir,
+        ignored_ids,
+        name_map,
+        full_pdf_output,
     )
 
     print(f"{GREEN}{BOLD}template PDF saved to `{template_output}`")

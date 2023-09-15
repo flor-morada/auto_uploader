@@ -40,6 +40,7 @@ RESET = "\033[0m"
 
 class RuleType(Enum):
     """Rules can either BAN something, or REQUIRE it. Used for RuleCheckers."""
+
     REQUIRE = "Require"
     BAN = "Ban"
 
@@ -47,6 +48,7 @@ class RuleType(Enum):
 @dataclass(slots=True)
 class RuleViolation:
     """Keeps track of rule violated, and (maybe) the line it was violated on."""
+
     rule: str
     line: Optional[int]
 
@@ -60,13 +62,14 @@ class RuleViolation:
 class RuleChecker(ast.NodeVisitor):
     """
     A RuleChecker is a kind of NodeVisitor that keeps track of whether it has found
-    a particular function call / type of node / etc. as it visits each node 
+    a particular function call / type of node / etc. as it visits each node
     in the AST (Abstract Syntax Tree).
 
-    The general logic for whether a rule has been violated is below, and each 
+    The general logic for whether a rule has been violated is below, and each
     subclass will contain specific logic by overriding the various visit* methods
     of a NodeVisitor.
     """
+
     def __init__(self, ruletype: RuleType):
         self.ruletype = ruletype
         self.location = None
@@ -92,6 +95,7 @@ class RuleChecker(ast.NodeVisitor):
 
 class MethodRule(RuleChecker):
     """RuleChecker that keeps track of calls to a particular `method`."""
+
     def __init__(self, ruletype: RuleType, method: str):
         super().__init__(ruletype)
         self.method = method
@@ -104,12 +108,13 @@ class MethodRule(RuleChecker):
 
     def __str__(self) -> str:
         return f"{self.ruletype.value}MethodCall({self.method})"
-    
+
     __repr__ = __str__
 
 
 class FunctionRule(RuleChecker):
     """RuleChecker that keeps track of calls to a particular `function`."""
+
     def __init__(self, ruletype: RuleType, function: str):
         super().__init__(ruletype)
         self.function = function
@@ -132,6 +137,7 @@ class NodeRule(RuleChecker):
 
     NOTE: `node_type` must be an attribute of the ast module (one of its node types)
     """
+
     def __init__(self, ruletype: RuleType, node_type: str):
         super().__init__(ruletype)
         self.node_type = getattr(ast, node_type)
@@ -158,7 +164,7 @@ def find_violations(filename: str, rules: list[RuleChecker]) -> list[RuleViolati
     code = open(filename).read()
     try:
         tree = ast.parse(code)
-    except (SyntaxError):
+    except SyntaxError:
         return []
 
     for rulechecker in rules:
@@ -181,7 +187,9 @@ def print_violations(violations: list[RuleViolation], filename: str) -> None:
         if v.line is None:
             print(f"rule {RED}{v.rule}{RESET} not fulfilled.")
         else:
-            print(f"rule {RED}{v.rule}{RESET} violated on line {v.line}: {RED}`{lines[v.line].rstrip()}`{RESET}")
+            print(
+                f"rule {RED}{v.rule}{RESET} violated on line {v.line}: {RED}`{lines[v.line].rstrip()}`{RESET}"
+            )
 
 
 def main():

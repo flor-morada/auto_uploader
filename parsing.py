@@ -22,9 +22,9 @@ from rules import FunctionRule, MethodRule, NodeRule, RuleChecker, RuleType
 
 def parse_file(filename: str) -> dict[str, list[RuleChecker]]:
     """
-    Parses `filename`, a .aup file. 
-    Returns a dictionary mapping each problem name to the list of RuleChecker 
-    corresponding to the problem, as outlined in the aup file. 
+    Parses `filename`, a .aup file.
+    Returns a dictionary mapping each problem name to the list of RuleChecker
+    corresponding to the problem, as outlined in the aup file.
     """
     rules = {}
     cur_problem = "universal"
