@@ -1,0 +1,3 @@
+fpdf==1.7.2
+icecream==2.1.3
+pandas==1.5.3

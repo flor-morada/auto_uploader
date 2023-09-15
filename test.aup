@@ -1,0 +1,26 @@
+# This is an example AUP file.
+# Comments are allowed and not parsed
+
+# Global rules apply to all problems
+ban node While
+require method add
+
+# All rules from one `problem` line to another apply to the named problem.
+# Indentation doesn't matter, but each rule must be on its own line.
+problem p1
+	ban node ListComp
+	require node For
+	ban method join
+	require function sum
+
+# All problems must be listed, even if they have no specific rules.
+problem p2
+
+problem p3
+	ban function max
+	require node For
+
+problem p4
+	require node ListComp
+
+problem p5

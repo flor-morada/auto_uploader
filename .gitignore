@@ -1,0 +1,3 @@
+*.json
+assignments/
+__pycache__/
