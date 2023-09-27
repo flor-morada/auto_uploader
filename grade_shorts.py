@@ -33,6 +33,7 @@ from rules import RuleChecker, RuleViolation, find_violations, print_violations
 
 YEARLY_CONFIG = "2023-24_config.json"
 # ANSI escape codes
+RED = "\033[91m"
 GREEN = "\033[92m"
 BOLD = "\033[1m"
 RESET = "\033[0m"
@@ -182,7 +183,7 @@ def get_args(args: list[str]) -> tuple[str, str, str, str]:
     Returns: directory, csv, code_directory, aup
     """
     if len(args) != 2:
-        print("Error: please give a directory which contains aup, csv, and code dir")
+        print(f"{RED}Error: please give a directory which contains aup, csv, and code dir{RESET}")
         sys.exit(1)
     _, folder = args
 
@@ -190,20 +191,32 @@ def get_args(args: list[str]) -> tuple[str, str, str, str]:
     for elem in os.listdir(folder):
         path = os.path.join(folder, elem)
         if path.endswith(".csv"):
-            csv_file = path
+            if csv_file is None:
+                csv_file = path
+            else:
+                print(f"{RED}Error: multiple csv files found{RESET}")
+                sys.exit(1)
         elif path.endswith(".aup"):
-            aup_file = path
+            if aup_file is None:
+                aup_file = path
+            else:
+                print(f"{RED}Error: multiple aup files found{RESET}")
+                sys.exit(1)
         elif os.path.isdir(path):
-            code_dir = path
+            if code_dir is None:
+                code_dir = path
+            else:
+                print(f"{RED}Error: multiple code directories found{RESET}")
+                sys.exit(1)
 
     if not csv_file:
-        print("Error: missing csv file in given directory")
+        print(f"{RED}Error: missing csv file in given directory{RESET}")
         sys.exit(1)
     if not aup_file:
-        print("Error: missing aup file in given directory")
+        print(f"{RED}Error: missing aup file in given directory{RESET}")
         sys.exit(1)
     if not code_dir:
-        print("Error: missing code directory in given directory")
+        print(f"{RED}Error: missing code directory in given directory{RESET}")
         sys.exit(1)
 
     return folder, csv_file, code_dir, aup_file
@@ -212,7 +225,7 @@ def get_args(args: list[str]) -> tuple[str, str, str, str]:
 def get_config(filename: str) -> tuple[dict[str, str], set[str]]:
     """Reads config json and returns name_map and ignored_ids as a dict and set"""
     if not os.path.exists(filename):
-        print(f"Error: `{YEARLY_CONFIG}` does not exist. proceeding without.")
+        print(f"{RED}Error: `{YEARLY_CONFIG}` does not exist. proceeding without.")
         return {}, set()
 
     with open(filename, "r") as file:
