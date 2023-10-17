@@ -237,27 +237,21 @@ def main():
     name_map, ignored_ids = get_config(YEARLY_CONFIG)
 
     rules = parse_file(aup_file)
-    problem_list = sorted(rules.keys())
-    problem_list.remove("universal")
-    scores_df = pd.read_csv(csv_file).set_index("netid")
+    problems = sorted(rules.keys())
+    problems.remove("universal")
+    df = pd.read_csv(csv_file).set_index("netid")
 
-    template_output = os.path.join(input_dir, "gradescope_template.pdf")
-    full_pdf_output = os.path.join(input_dir, "gradescope_output.pdf")
+    template_path = os.path.join(input_dir, "gradescope_template.pdf")
+    full_pdf_path = os.path.join(input_dir, "gradescope_output.pdf")
 
-    create_template_pdf(scores_df, problem_list, template_output)
-    violations = find_all_violations(scores_df, rules, code_dir)
+    create_template_pdf(df, problems, template_path)
+    violations = find_all_violations(df, rules, code_dir)
     create_score_pdf(
-        scores_df,
-        problem_list,
-        violations,
-        code_dir,
-        ignored_ids,
-        name_map,
-        full_pdf_output,
+        df, problems, violations, code_dir, ignored_ids, name_map, full_pdf_path,
     )
 
-    print(f"{GREEN}{BOLD}template PDF saved to `{template_output}`")
-    print(f"output PDF saved to `{full_pdf_output}`{RESET}")
+    print(f"{GREEN}{BOLD}template PDF saved to `{template_path}`")
+    print(f"output PDF saved to `{full_pdf_path}`{RESET}")
 
 
 if __name__ == "__main__":
