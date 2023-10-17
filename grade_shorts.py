@@ -183,41 +183,31 @@ def get_args(args: list[str]) -> tuple[str, str, str, str]:
     Returns: directory, csv, code_directory, aup
     """
     if len(args) != 2:
-        print(f"{RED}Error: please give a directory which contains aup, csv, and code dir{RESET}")
-        sys.exit(1)
+        raise ValueError("directory missing aup, csv, or code directory")
     _, folder = args
 
     csv_file, aup_file, code_dir = None, None, None
     for elem in os.listdir(folder):
         path = os.path.join(folder, elem)
         if path.endswith(".csv"):
-            if csv_file is None:
-                csv_file = path
-            else:
-                print(f"{RED}Error: multiple csv files found{RESET}")
-                sys.exit(1)
+            if csv_file is not None:
+                raise ValueError("multiple csv files found")
+            csv_file = path
         elif path.endswith(".aup"):
-            if aup_file is None:
-                aup_file = path
-            else:
-                print(f"{RED}Error: multiple aup files found{RESET}")
-                sys.exit(1)
+            if aup_file is not None:
+                raise ValueError("multiple aup files found")
+            aup_file = path
         elif os.path.isdir(path):
-            if code_dir is None:
-                code_dir = path
-            else:
-                print(f"{RED}Error: multiple code directories found{RESET}")
-                sys.exit(1)
+            if code_dir is not None:
+                raise ValueError("multiple code directories found")
+            code_dir = path
 
     if not csv_file:
-        print(f"{RED}Error: missing csv file in given directory{RESET}")
-        sys.exit(1)
+        raise ValueError("missing csv file in given directory")
     if not aup_file:
-        print(f"{RED}Error: missing aup file in given directory{RESET}")
-        sys.exit(1)
+        raise ValueError("missing aup file in given directory")
     if not code_dir:
-        print(f"{RED}Error: missing code directory in given directory{RESET}")
-        sys.exit(1)
+        raise ValueError("missing code directory in given directory")
 
     return folder, csv_file, code_dir, aup_file
 
@@ -238,7 +228,11 @@ def get_config(filename: str) -> tuple[dict[str, str], set[str]]:
 
 
 def main():
-    input_dir, csv_file, code_dir, aup_file = get_args(sys.argv)
+    try:
+        input_dir, csv_file, code_dir, aup_file = get_args(sys.argv)
+    except ValueError as e:
+        print(f"{RED}Error: {e}{RESET}")
+        sys.exit(1)
 
     name_map, ignored_ids = get_config(YEARLY_CONFIG)
 
