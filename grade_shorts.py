@@ -79,15 +79,16 @@ def find_all_violations(
         {NETID -> {PROBLEM -> list[RuleViolation]}}
     """
     violations = {}
-    files = os.walk(code_dir)
-    next(files)  # skip over the folder itself
-    for netid_folder, _, assignments in files:
-        netid = os.path.basename(netid_folder)
 
-        for problem_file in sorted(assignments):
+    for netid_dir in os.listdir(code_dir):
+        netid = os.path.basename(netid_dir)
+        netid_dir = os.path.join(code_dir, netid_dir)
+        assignments = sorted(os.listdir(netid_dir))
+
+        for problem_file in assignments:
             problem_name = problem_file.removesuffix(".py")
             problem_rules = rules["universal"] + rules[problem_name]
-            problem_filepath = os.path.join(netid_folder, problem_file)
+            problem_filepath = os.path.join(netid_dir, problem_file)
 
             problem_violations = find_violations(problem_filepath, problem_rules)
             violations.setdefault(netid, {})
