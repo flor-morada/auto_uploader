@@ -90,7 +90,8 @@ def find_all_violations(
             problem_rules = rules["universal"] + rules[problem_name]
             problem_filepath = os.path.join(netid_dir, problem_file)
 
-            problem_violations = find_violations(problem_filepath, problem_rules)
+            code = open(problem_filepath).read()
+            problem_violations = find_violations(code, problem_rules)
             violations.setdefault(netid, {})
             violations[netid][problem_name] = problem_violations
 

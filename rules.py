@@ -15,7 +15,7 @@ CLASSES:
         - `MethodRule(RuleChecker)`: For a particular method call.
 
 FUNCTIONS:
-    - `get_violations(filename: str, rules: list[RuleChecker]) -> list[RuleViolation]`
+    - `get_violations(code: str, rules: list[RuleChecker]) -> list[RuleViolation]`
     - `print_violations(violations: list[RuleViolation], filename: str)`
 
 USAGE:
@@ -155,13 +155,12 @@ class NodeRule(RuleChecker):
     __repr__ = __str__
 
 
-def find_violations(filename: str, rules: list[RuleChecker]) -> list[RuleViolation]:
+def find_violations(code: str, rules: list[RuleChecker]) -> list[RuleViolation]:
     """
-    Finds any violations of `rules` in `filename`, by having each RuleChecker
-    visit the AST of `filename`.
+    Finds any violations of `rules` in `code`, by having each RuleChecker
+    visit the AST of `code`.
     Returns a list of any such violations found, as list[RuleViolation]
     """
-    code = open(filename).read()
     try:
         tree = ast.parse(code)
     except SyntaxError:
@@ -206,7 +205,8 @@ def main():
     ]
 
     filename = input("enter file to check: ")
-    violations = ic(find_violations(filename, rules))
+    code = open(filename).read()
+    violations = ic(find_violations(code, rules))
     if len(violations) == 0:
         print("all rules followed.")
     else:
