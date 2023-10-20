@@ -54,9 +54,9 @@ class RuleViolation:
 
     def __str__(self) -> str:
         if self.line is None:
-            return f"rule {self.rule} not fulfilled."
+            return f"rule {self.rule} not fulfilled"
         else:
-            return f"rule {self.rule} violated on line {self.line}."
+            return f"rule {self.rule} violated on line {self.line}"
 
 
 class RuleChecker(ast.NodeVisitor):
@@ -175,20 +175,21 @@ def find_violations(code: str, rules: list[RuleChecker]) -> list[RuleViolation]:
     return violations
 
 
-def print_violations(violations: list[RuleViolation], filename: str) -> None:
+def print_violations(
+        violations: list[RuleViolation], filename: Optional[str] = None, 
+) -> None:
     """
     Prints each of the `violations` alongside the corresponding line in `filename`
     if applicable.
     """
-    lines = open(filename).readlines()
-    lines.insert(0, "")  # so line numbers are correct
+    if filename:
+        lines = open(filename).readlines()
+        lines.insert(0, "")  # so line numbers are correct
     for v in violations:
-        if v.line is None:
-            print(f"rule {RED}{v.rule}{RESET} not fulfilled.")
-        else:
-            print(
-                f"rule {RED}{v.rule}{RESET} violated on line {v.line}: {RED}`{lines[v.line].rstrip()}`{RESET}"
-            )
+        s = str(v)
+        if filename and v.line:
+            s += f"{RED} `{lines[v.line].rstrip()}`{RESET}"
+        print(s)
 
 
 def main():
