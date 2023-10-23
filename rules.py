@@ -77,25 +77,23 @@ class RuleChecker(ast.NodeVisitor):
 
     def __init__(self, ruletype: RuleType):
         self.ruletype = ruletype
-        self.location = None
-        self.found_instance = False
+        self.found_location = None
 
     def reset(self):
         """Resets the status of the RuleChecker to check a new file."""
-        self.location = None
-        self.found_instance = False
+        self.found_location = None
 
     def get_violation(self) -> Optional[RuleViolation]:
         """Returns the violation found by this RuleChecker, or None."""
         if self.ruletype is RuleType.BAN:
-            rule_followed = not self.found_instance
+            rule_followed = not self.found_location
         else:
-            rule_followed = self.found_instance
+            rule_followed = self.found_location
 
         if rule_followed:
             return None
         else:
-            return RuleViolation(str(self), self.location)
+            return RuleViolation(str(self), self.found_location)
 
 
 class MethodRule(RuleChecker):
@@ -108,8 +106,7 @@ class MethodRule(RuleChecker):
     # Overrides ast.NodeVisitor.visit_Attribute
     def visit_Attribute(self, node):
         if node.attr == self.method:
-            self.found_instance = True
-            self.location = node.lineno
+            self.found_location = node.lineno
 
     def __str__(self) -> str:
         return f"{self.ruletype.value}MethodCall({self.method})"
@@ -127,8 +124,7 @@ class FunctionRule(RuleChecker):
     # Overrides ast.NodeVisitor.visit_Call
     def visit_Call(self, node):
         if isinstance(node.func, ast.Name) and node.func.id == self.function:
-            self.found_instance = True
-            self.location = node.lineno
+            self.found_location = node.lineno
 
     def __str__(self) -> str:
         return f"{self.ruletype.value}FunctionCall({self.function})"
@@ -150,8 +146,7 @@ class NodeRule(RuleChecker):
     # Overrides ast.NodeVisitor.visit
     def visit(self, node):
         if isinstance(node, self.node_type):
-            self.found_instance = True
-            self.location = node.lineno
+            self.found_location = node.lineno
         super().visit(node)
 
     def __str__(self) -> str:
