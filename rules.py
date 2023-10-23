@@ -3,20 +3,19 @@ FILE: rules.py
 AUTHOR: Jordan Rodriguez (jerodriguez@arizona.edu)
 
 DESCRIPTION: 
-    Module with RuleCheckers for various syntax rules, and functions to check
-    rules and print output.
+    Module with RuleCheckers for various syntax rules, and a function to check
+    code against the rules.
 
 CLASSES:
     - `RuleType(Enum)`: RuleType.BAN and RuleType.REQUIRE.
-    - `RuleViolation`: dataclass with (rule: str, line: Optional[int])
+    - `RuleViolation`: dataclass to keep track of which/where rules are violated.
     - `RuleChecker(ast.NodeVisitor)`: Keeps track of a syntax rule by visiting AST
-        - `NodeRule(RuleChecker)`: Keeps track of a type of AST node.
-        - `FunctionRule(RuleChecker)`: For a particular function call.
-        - `MethodRule(RuleChecker)`: For a particular method call.
+        - `NodeRule(RuleChecker)`: Bans/requires a type of AST node.
+        - `FunctionRule(RuleChecker)`: Bans/requires a particular function call.
+        - `MethodRule(RuleChecker)`: Bans/requires a particular method call.
 
 FUNCTIONS:
     - `get_violations(code: str, rules: list[RuleChecker]) -> list[RuleViolation]`
-    - `print_violations(violations: list[RuleViolation], filename: str)`
 
 USAGE:
     python3 rules.py
@@ -55,13 +54,13 @@ class RuleViolation:
 
     def __str__(self) -> str:
         if not self.line_num and not self.line:
-            return f"rule {RED}{self.rule}{RESET} not fulfilled"
+            return f"rule {self.rule} not fulfilled"
 
-        s = f"rule {RED}{self.rule}{RESET} violated"
+        s = f"rule {self.rule} violated"
         if self.line_num:
             s += f" on line {self.line_num}"
         if self.line:
-            s += f": {RED}`{self.line}`{RESET}"
+            s += f": `{self.line}`"
         return s
 
 
@@ -188,20 +187,6 @@ def find_violations(code: str, rules: list[RuleChecker]) -> list[RuleViolation]:
     return violations
 
 
-def print_violations(violations: list[RuleViolation]) -> None:
-    """Prints each of the `violations`"""
-    for violation in violations:
-        print(violation)
-    # if filename:
-    #     lines = open(filename).readlines()
-    #     lines.insert(0, "")  # so line numbers are correct
-    # for v in violations:
-    #     s = str(v)
-    #     if filename and v.line_num:
-    #         s += f"{RED} `{lines[v.line_num].rstrip()}`{RESET}"
-    #     print(s)
-
-
 def main():
     rules = [
         NodeRule(RuleType.BAN, "For"),
@@ -221,7 +206,7 @@ def main():
     if len(violations) == 0:
         print("all rules followed.")
     else:
-        print_violations(violations)
+        print(*violations, sep="\n")
 
 
 if __name__ == "__main__":

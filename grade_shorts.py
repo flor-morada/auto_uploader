@@ -29,7 +29,7 @@ import pandas as pd
 from fpdf import FPDF
 
 from parsing import parse_file
-from rules import RuleChecker, RuleViolation, find_violations, print_violations
+from rules import RuleChecker, RuleViolation, find_violations
 
 YEARLY_CONFIG = "2023-24_config.json"
 # ANSI escape codes
@@ -96,9 +96,8 @@ def find_all_violations(
             violations[netid][problem_name] = problem_violations
 
             if len(problem_violations) != 0:
-                print(f"VIOLATION FOUND IN {problem_file} FOR {netid}")
-                print_violations(problem_violations)
-                print()
+                print(f"VIOLATION FOUND IN {problem_file} FOR {netid}{RED}")
+                print(*problem_violations, RESET, sep='\n')
                 # If any violations found, score is 0
                 scores.at[netid, f"{problem_name} passed"] = 0
 
