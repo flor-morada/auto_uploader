@@ -97,7 +97,7 @@ def find_all_violations(
 
             if len(problem_violations) != 0:
                 print(f"VIOLATION FOUND IN {problem_file} FOR {netid}")
-                print_violations(problem_violations, problem_filepath)
+                print_violations(problem_violations)
                 print()
                 # If any violations found, score is 0
                 scores.at[netid, f"{problem_name} passed"] = 0
@@ -111,7 +111,7 @@ def add_code_to_pdf(pdf: FPDF, code_file: str, violations: list[RuleViolation]) 
     """
     lines = open(code_file).readlines()
 
-    violation_lines = [v.line for v in violations]
+    violation_lines = [v.line_num for v in violations]
     for i, line in enumerate(lines[:28], 1):
         if i in violation_lines:
             pdf.set_text_color(255, 0, 0)

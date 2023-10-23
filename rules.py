@@ -47,16 +47,22 @@ class RuleType(Enum):
 
 @dataclass(slots=True)
 class RuleViolation:
-    """Keeps track of rule violated, and (maybe) the line it was violated on."""
+    """Keeps track of rule violated, line num and corresponding line if applicable."""
 
     rule: str
-    line: Optional[int]
+    line_num: Optional[int] = None
+    line: Optional[str] = None
 
     def __str__(self) -> str:
-        if self.line is None:
-            return f"rule {self.rule} not fulfilled"
-        else:
-            return f"rule {self.rule} violated on line {self.line}"
+        if not self.line_num and not self.line:
+            return f"rule {RED}{self.rule}{RESET} not fulfilled"
+
+        s = f"rule {RED}{self.rule}{RESET} violated"
+        if self.line_num:
+            s += f" on line {self.line_num}"
+        if self.line:
+            s += f": {RED}`{self.line}`{RESET}"
+        return s
 
 
 class RuleChecker(ast.NodeVisitor):
@@ -172,24 +178,28 @@ def find_violations(code: str, rules: list[RuleChecker]) -> list[RuleViolation]:
 
     violations = (rule.get_violation() for rule in rules)
     violations = [v for v in violations if v is not None]
+    # Add lines of code to RuleViolations
+    code_lines = [line.rstrip() for line in code.splitlines()]
+    code_lines.insert(0, None) # make list indices correspond to line nums
+    for violation in violations:
+        if violation.line_num:
+            violation.line = code_lines[violation.line_num]
+
     return violations
 
 
-def print_violations(
-        violations: list[RuleViolation], filename: Optional[str] = None, 
-) -> None:
-    """
-    Prints each of the `violations` alongside the corresponding line in `filename`
-    if applicable.
-    """
-    if filename:
-        lines = open(filename).readlines()
-        lines.insert(0, "")  # so line numbers are correct
-    for v in violations:
-        s = str(v)
-        if filename and v.line:
-            s += f"{RED} `{lines[v.line].rstrip()}`{RESET}"
-        print(s)
+def print_violations(violations: list[RuleViolation]) -> None:
+    """Prints each of the `violations`"""
+    for violation in violations:
+        print(violation)
+    # if filename:
+    #     lines = open(filename).readlines()
+    #     lines.insert(0, "")  # so line numbers are correct
+    # for v in violations:
+    #     s = str(v)
+    #     if filename and v.line_num:
+    #         s += f"{RED} `{lines[v.line_num].rstrip()}`{RESET}"
+    #     print(s)
 
 
 def main():
@@ -211,7 +221,7 @@ def main():
     if len(violations) == 0:
         print("all rules followed.")
     else:
-        print_violations(violations, "test.py")
+        print_violations(violations)
 
 
 if __name__ == "__main__":
