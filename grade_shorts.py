@@ -31,7 +31,7 @@ from fpdf import FPDF
 from parsing import parse_file
 from rules import RuleChecker, RuleViolation, find_violations
 
-YEARLY_CONFIG = "2023-24_config.json"
+YEARLY_CONFIG = "SP24_config.json"
 # ANSI escape codes
 RED = "\033[91m"
 GREEN = "\033[92m"
