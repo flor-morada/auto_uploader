@@ -107,6 +107,7 @@ class MethodRule(RuleChecker):
     def visit_Attribute(self, node):
         if node.attr == self.method:
             self.found_location = node.lineno
+        super().visit(node.value)
 
     def __str__(self) -> str:
         return f"{self.ruletype.value}MethodCall({self.method})"
@@ -125,6 +126,10 @@ class FunctionRule(RuleChecker):
     def visit_Call(self, node):
         if isinstance(node.func, ast.Name) and node.func.id == self.function:
             self.found_location = node.lineno
+        for e in node.args:
+            super().visit(e)
+        for e in node.keywords:
+            super().visit(e)
 
     def __str__(self) -> str:
         return f"{self.ruletype.value}FunctionCall({self.function})"
