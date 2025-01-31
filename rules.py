@@ -15,7 +15,7 @@ CLASSES:
         - `MethodRule(RuleChecker)`: Bans/requires a particular method call.
 
 FUNCTIONS:
-    - `get_violations(code: str, rules: list[RuleChecker]) -> list[RuleViolation]`
+    - `find_violations(code: str, rules: list[RuleChecker]) -> list[RuleViolation]`
 
 USAGE:
     python3 rules.py
@@ -54,11 +54,11 @@ class RuleViolation:
 
     def __str__(self) -> str:
         if not self.line_num and not self.line:
-            return f"rule {self.rule} not fulfilled"
+            return f"{self.rule} Your code does not have it."
 
-        s = f"rule {self.rule} violated"
+        s = f"{self.rule}"
         if self.line_num:
-            s += f" on line {self.line_num}"
+            s += f" Your code has it on line {self.line_num}"
         if self.line:
             s += f": `{self.line}`"
         return s
@@ -110,7 +110,8 @@ class MethodRule(RuleChecker):
         super().visit(node.value)
 
     def __str__(self) -> str:
-        return f"{self.ruletype.value}MethodCall({self.method})"
+        verb = "banned" if self.ruletype == RuleType.BAN else "required"
+        return f"Method {self.method} is {verb}."
 
     __repr__ = __str__
 
@@ -132,7 +133,8 @@ class FunctionRule(RuleChecker):
             super().visit(e)
 
     def __str__(self) -> str:
-        return f"{self.ruletype.value}FunctionCall({self.function})"
+        verb = "banned" if self.ruletype == RuleType.BAN else "required"
+        return f"Function {self.function} is {verb}."
 
     __repr__ = __str__
 
@@ -155,7 +157,8 @@ class NodeRule(RuleChecker):
         super().visit(node)
 
     def __str__(self) -> str:
-        return f"{self.ruletype.value}{self.node_type.__name__}"
+        verb = "banned" if self.ruletype == RuleType.BAN else "required"
+        return f"{self.node_type.__name__} is {verb}."
 
     __repr__ = __str__
 
